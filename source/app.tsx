@@ -1,14 +1,30 @@
-import React from 'react';
-import {Text} from 'ink';
+import React, {useEffect} from 'react';
+import AppProvider from './components/AppContext.js';
+import {useWidth} from './components/useWidth.js';
+import ProvidersPanel from './components/ProvidersPanel.js';
+import {useInput} from 'ink';
+import {useAltScreen} from './components/useAltScreen.js';
 
-type Props = {
-	name: string | undefined;
-};
+export default function App() {
+	const width = useWidth();
+	const leftWidth = Math.floor(width * 0.35);
+	// const rightWidth = width - leftWidth;
 
-export default function App({name = 'Stranger'}: Props) {
+	const {enterAlt, exitAlt} = useAltScreen();
+	useEffect(function () {
+		enterAlt();
+		return () => exitAlt();
+	}, []);
+	useInput(function (input) {
+		if (input === 'q') {
+			exitAlt();
+			process.exit();
+		}
+	});
+
 	return (
-		<Text>
-			Hello, <Text color="green">{name}</Text>
-		</Text>
+		<AppProvider>
+			<ProvidersPanel width={leftWidth} />
+		</AppProvider>
 	);
 }
